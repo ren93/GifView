@@ -7,9 +7,12 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Movie;
 import android.os.SystemClock;
+import android.support.annotation.FloatRange;
 import android.support.v7.widget.AppCompatImageView;
 import android.util.AttributeSet;
 import android.view.View;
+
+import java.math.BigDecimal;
 
 
 /**
@@ -22,14 +25,22 @@ public class GifImageView extends AppCompatImageView {
     private static final int DEFAULT_DURATION = 1000;
 
     private Movie movie;
-
+    //播放开始时间点
     private long mMovieStart;
+    //播放暂停时间点
     private long mMoviePauseTime;
+    //播放暂停时间
     private long dealyTime;
+    //播放完成进度
+    @FloatRange(from = 0, to = 1.0f)
     float percent;
+    //播放次数，-1为循环播放
     private int counts = -1;
+
+    private volatile boolean reverse = false;
     private volatile boolean mPaused;
     private volatile boolean hasStart;
+
     private boolean mVisible = true;
 
     private OnPlayListener mOnPlayListener;
@@ -95,14 +106,15 @@ public class GifImageView extends AppCompatImageView {
         }
     }
 
-
+    //从新开始播放
     public void playOver() {
         if (movie != null) {
             play(-1);
         }
     }
 
-    public void playReserver() {
+    //倒叙播放
+    public void playReverse() {
         if (movie != null) {
             reset();
             reverse = true;
@@ -174,12 +186,14 @@ public class GifImageView extends AppCompatImageView {
                 mOnPlayListener.onPlayEnd();
             }
         }
-        int currentTime = (int) ((now - mMovieStart) % movieDuration);
-        percent = ((float) currentTime) / ((float) movieDuration);
+        float currentTime =  (now - mMovieStart) % movieDuration;
+        percent = currentTime / movieDuration;
         if (mOnPlayListener != null && hasStart) {
-            mOnPlayListener.onPlaying(percent);
+            BigDecimal b = new BigDecimal(percent);
+            double f1 = b.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+            mOnPlayListener.onPlaying((float) f1);
         }
-        return currentTime;
+        return (int) currentTime;
     }
 
     public void setPercent(float percent) {
@@ -202,7 +216,6 @@ public class GifImageView extends AppCompatImageView {
         return !this.mPaused && hasStart;
     }
 
-    boolean reverse = false;
 
     @Override
     protected void onDraw(Canvas canvas) {
@@ -227,7 +240,6 @@ public class GifImageView extends AppCompatImageView {
      * 画出gif帧
      */
     private void drawMovieFrame(Canvas canvas) {
-
         movie.draw(canvas, 0.0f, 0.0f);
     }
 
@@ -281,7 +293,7 @@ public class GifImageView extends AppCompatImageView {
     public interface OnPlayListener {
         void onPlayStart();
 
-        void onPlaying(float percent);
+        void onPlaying(@FloatRange(from = 0f,to = 1.0f) float percent);
 
         void onPlayPause(boolean pauseSuccess);
 

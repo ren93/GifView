@@ -24,12 +24,11 @@
 
     <SeekBar
         android:id="@+id/seek"
-        android:max="100"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:visibility="gone"
         android:layout_below="@+id/percent"
-        />
+        android:max="100"/>
+
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -49,6 +48,7 @@
             android:onClick="palyone"
             android:text="单次播放"
             />
+
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

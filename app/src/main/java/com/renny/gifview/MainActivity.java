@@ -1,6 +1,7 @@
 package com.renny.gifview;
 
 import android.os.Bundle;
+import android.support.annotation.FloatRange;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -34,7 +35,7 @@ public class MainActivity extends AppCompatActivity implements SeekBar.OnSeekBar
             }
 
             @Override
-            public void onPlaying(float percent) {
+            public void onPlaying(@FloatRange(from = 0f,to = 1.0f)float percent) {
 
                 int per = (int) (percent * 100);
                 percentTv.setText("播放进度: " + per + "%");
@@ -72,7 +73,7 @@ public class MainActivity extends AppCompatActivity implements SeekBar.OnSeekBar
     public void palyreverse(View view) {
         hasPaused = false;
         pauseBtn.setText("暂停");
-        gifImageView.playReserver();
+        gifImageView.playReverse();
         pauseBtn.setVisibility(View.VISIBLE);
     }
     public void palyone(View view) {
