@@ -10,6 +10,7 @@ import android.os.SystemClock;
 import android.support.annotation.FloatRange;
 import android.support.v7.widget.AppCompatImageView;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 
 import java.math.BigDecimal;
@@ -23,7 +24,9 @@ import java.math.BigDecimal;
 public class GifImageView extends AppCompatImageView {
 
     private static final int DEFAULT_DURATION = 1000;
-
+    private float mScaleW = 1.0f;
+    private float mScaleH = 1.0f;
+    private float mScale = 1.0f;
     private Movie movie;
     //播放开始时间点
     private long mMovieStart;
@@ -186,11 +189,12 @@ public class GifImageView extends AppCompatImageView {
                 mOnPlayListener.onPlayEnd();
             }
         }
-        float currentTime =  (now - mMovieStart) % movieDuration;
+        float currentTime = (now - mMovieStart) % movieDuration;
         percent = currentTime / movieDuration;
         if (mOnPlayListener != null && hasStart) {
-            BigDecimal b = new BigDecimal(percent);
-            double f1 = b.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+            BigDecimal mData = new BigDecimal(percent).setScale(2, BigDecimal.ROUND_HALF_UP);
+            double f1 = mData.doubleValue();
+            f1 = f1 == 0.99 ? 1.0 : f1;
             mOnPlayListener.onPlaying((float) f1);
         }
         return (int) currentTime;
@@ -219,6 +223,7 @@ public class GifImageView extends AppCompatImageView {
 
     @Override
     protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
         if (movie != null) {
             if (!mPaused && hasStart) {
                 if (reverse) {
@@ -231,8 +236,6 @@ public class GifImageView extends AppCompatImageView {
             } else {
                 drawMovieFrame(canvas);
             }
-        } else {
-            super.onDraw(canvas);
         }
     }
 
@@ -240,15 +243,33 @@ public class GifImageView extends AppCompatImageView {
      * 画出gif帧
      */
     private void drawMovieFrame(Canvas canvas) {
+        canvas.save();
+        canvas.scale(1 / mScale, 1 / mScale);
         movie.draw(canvas, 0.0f, 0.0f);
+        canvas.restore();
     }
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+
+        int widthMode = MeasureSpec.getMode(widthMeasureSpec);
+        int heightMode = MeasureSpec.getMode(heightMeasureSpec);
+        int sizeWidth = MeasureSpec.getSize(widthMeasureSpec);
+        int sizeHeight = MeasureSpec.getSize(heightMeasureSpec);
+
         if (movie != null) {
             int movieWidth = movie.width();
             int movieHeight = movie.height();
-            setMeasuredDimension(movieWidth, movieHeight);
+            if (widthMode == MeasureSpec.EXACTLY) {
+                mScaleW = ((float) movieWidth) / sizeWidth;
+            }
+            if (heightMode == MeasureSpec.EXACTLY) {
+                mScaleH = ((float) movieHeight) / sizeHeight;
+            }
+            mScale = Math.max(mScaleW, mScaleH);
+            setMeasuredDimension((widthMode == MeasureSpec.EXACTLY) ? sizeWidth
+                    : movieWidth, (heightMode == MeasureSpec.EXACTLY) ? sizeHeight
+                    : movieHeight);
         } else {
             super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         }
@@ -293,7 +314,7 @@ public class GifImageView extends AppCompatImageView {
     public interface OnPlayListener {
         void onPlayStart();
 
-        void onPlaying(@FloatRange(from = 0f,to = 1.0f) float percent);
+        void onPlaying(@FloatRange(from = 0f, to = 1.0f) float percent);
 
         void onPlayPause(boolean pauseSuccess);
 

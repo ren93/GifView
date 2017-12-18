@@ -28,16 +28,16 @@ public class MainActivity extends AppCompatActivity implements SeekBar.OnSeekBar
         mSeekBar.setOnSeekBarChangeListener(this);
         percentTv = (TextView) findViewById(R.id.percent);
         gifImageView = (GifImageView) findViewById(R.id.gif);
-        gifImageView.setGifResource(R.drawable.dog, new GifImageView.OnPlayListener() {
+        gifImageView.setGifResource(R.drawable.meizhi, new GifImageView.OnPlayListener() {
             @Override
             public void onPlayStart() {
                 ToastHelper.getInstance(MainActivity.this.getApplication()).makeToast("开始");
             }
 
             @Override
-            public void onPlaying(@FloatRange(from = 0f,to = 1.0f)float percent) {
-
-                int per = (int) (percent * 100);
+            public void onPlaying(@FloatRange(from = 0f, to = 1.0f) float percent) {
+                int per = Math.round(percent * 100);
+                mSeekBar.setProgress(per);
                 percentTv.setText("播放进度: " + per + "%");
             }
 
@@ -70,12 +70,14 @@ public class MainActivity extends AppCompatActivity implements SeekBar.OnSeekBar
         gifImageView.play(-1);
         pauseBtn.setVisibility(View.VISIBLE);
     }
+
     public void palyreverse(View view) {
         hasPaused = false;
         pauseBtn.setText("暂停");
         gifImageView.playReverse();
         pauseBtn.setVisibility(View.VISIBLE);
     }
+
     public void palyone(View view) {
         hasPaused = false;
         pauseBtn.setText("暂停");

@@ -9,11 +9,10 @@
 
     <com.renny.gifview.GifImageView
         android:id="@+id/gif"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="140dp"
+        android:layout_height="140dp"
         android:layout_centerHorizontal="true"
-        app:authPlay="false"
-        />
+        app:authPlay="false"/>
 
     <TextView
         android:id="@+id/percent"
