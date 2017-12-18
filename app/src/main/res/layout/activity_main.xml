@@ -9,8 +9,8 @@
 
     <com.renny.gifview.GifImageView
         android:id="@+id/gif"
-        android:layout_width="140dp"
-        android:layout_height="140dp"
+        android:layout_width="240dp"
+        android:layout_height="240dp"
         android:layout_centerHorizontal="true"
         app:authPlay="false"/>
 
