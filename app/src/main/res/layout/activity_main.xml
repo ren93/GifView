@@ -28,6 +28,12 @@
         android:layout_below="@+id/percent"
         android:max="100"/>
 
+    <Button
+        android:onClick="load"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/seek"
+        android:text="加载新图片"/>
 
     <LinearLayout
         android:layout_width="match_parent"

@@ -114,4 +114,8 @@ public class MainActivity extends AppCompatActivity implements SeekBar.OnSeekBar
     }
 
 
+    public void load(View view) {
+        gifImageView.setGifResource(R.drawable.sky);
+        palyone(null);
+    }
 }

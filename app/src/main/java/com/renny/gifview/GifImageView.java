@@ -10,7 +10,6 @@ import android.os.SystemClock;
 import android.support.annotation.FloatRange;
 import android.support.v7.widget.AppCompatImageView;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 
 import java.math.BigDecimal;
@@ -78,7 +77,10 @@ public class GifImageView extends AppCompatImageView {
     }
 
     public void setGifResource(int movieResourceId, OnPlayListener onPlayListener) {
-        mOnPlayListener = onPlayListener;
+        if (onPlayListener != null) {
+            mOnPlayListener = onPlayListener;
+        }
+        reset();
         movie = Movie.decodeStream(getResources().openRawResource(movieResourceId));
         if (movie == null) {
             //如果movie为空，那么就不是gif文件，尝试转换为bitmap显示
@@ -92,9 +94,14 @@ public class GifImageView extends AppCompatImageView {
         requestLayout();
     }
 
+    public void setGifResource(int movieResourceId) {
+        setGifResource(movieResourceId, null);
+    }
+
     public void setGifResource(final String path, OnPlayListener onPlayListener) {
         movie = Movie.decodeFile(path);
         mOnPlayListener = onPlayListener;
+        reset();
         if (movie == null) {
             Bitmap bitmap = BitmapFactory.decodeFile(path);
             if (bitmap != null) {
