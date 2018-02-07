@@ -32,7 +32,7 @@ public class GifImageView extends AppCompatImageView {
     //播放暂停时间点
     private long mMoviePauseTime;
     //播放暂停时间
-    private long dealyTime;
+    private long offsetTime;
     //播放完成进度
     @FloatRange(from = 0, to = 1.0f)
     float percent;
@@ -47,6 +47,7 @@ public class GifImageView extends AppCompatImageView {
 
     private OnPlayListener mOnPlayListener;
     private int movieDuration;
+    private boolean endLastFrame = false;
 
     public GifImageView(Context context) {
         this(context, null);
@@ -63,11 +64,12 @@ public class GifImageView extends AppCompatImageView {
 
     private void setViewAttributes(Context context, AttributeSet attrs, int defStyle) {
         TypedArray a = context.obtainStyledAttributes(attrs,
-                R.styleable.GIFVIEW, defStyle, 0);
+                R.styleable.GifImageView, defStyle, 0);
 
-        int srcID = a.getResourceId(R.styleable.GIFVIEW_gifSrc, 0);
-        boolean authPlay = a.getBoolean(R.styleable.GIFVIEW_authPlay, true);
-        counts = a.getInt(R.styleable.GIFVIEW_playCount, -1);
+        int srcID = a.getResourceId(R.styleable.GifImageView_gif_src, 0);
+        boolean authPlay = a.getBoolean(R.styleable.GifImageView_auth_play, true);
+        counts = a.getInt(R.styleable.GifImageView_play_count, -1);
+        endLastFrame = a.getBoolean(R.styleable.GifImageView_end_last_frame, false);
         if (srcID > 0) {
             setGifResource(srcID, null);
             if (authPlay) play(counts);
@@ -150,7 +152,7 @@ public class GifImageView extends AppCompatImageView {
         mPaused = false;
         hasStart = true;
         mMoviePauseTime = 0;
-        dealyTime = 0;
+        offsetTime = 0;
     }
 
     public void play() {
@@ -159,7 +161,7 @@ public class GifImageView extends AppCompatImageView {
         if (hasStart) {
             if (mPaused && mMoviePauseTime > 0) {
                 mPaused = false;
-                dealyTime = dealyTime + SystemClock.uptimeMillis() - mMoviePauseTime;
+                offsetTime = offsetTime + SystemClock.uptimeMillis() - mMoviePauseTime;
                 invalidate();
                 if (mOnPlayListener != null) {
                     mOnPlayListener.onPlayRestart();
@@ -188,13 +190,14 @@ public class GifImageView extends AppCompatImageView {
     private int getCurrentFrameTime() {
         if (movieDuration == 0)
             return 0;
-        long now = SystemClock.uptimeMillis() - dealyTime;
+        long now = SystemClock.uptimeMillis() - offsetTime;
         int nowCount = (int) ((now - mMovieStart) / movieDuration);
         if (counts != -1 && nowCount >= counts) {
             hasStart = false;
             if (mOnPlayListener != null) {
                 mOnPlayListener.onPlayEnd();
             }
+            return endLastFrame ? movieDuration : 0;
         }
         float currentTime = (now - mMovieStart) % movieDuration;
         percent = currentTime / movieDuration;

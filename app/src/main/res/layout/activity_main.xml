@@ -12,7 +12,9 @@
         android:layout_width="240dp"
         android:layout_height="240dp"
         android:layout_centerHorizontal="true"
-        app:authPlay="false"/>
+        app:end_last_frame="true"
+        app:play_count="1"
+        />
 
     <TextView
         android:id="@+id/percent"
@@ -29,10 +31,10 @@
         android:max="100"/>
 
     <Button
-        android:onClick="load"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/seek"
+        android:onClick="load"
         android:text="加载新图片"/>
 
     <LinearLayout
